@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#050508" />
+<meta name="description" content="卡黄 · 黄婷婷 × 李艺彤 爱恨史 · 黑白夜蝶 CRT水银失真剧场（粉丝解说，非官方）" />
+<title>卡黄 · 黑白夜蝶 · CRT水银失真剧场</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Noto+Sans+SC:wght@400;500;700;900&family=Press+Start+2P&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<!-- CRT overlay layers -->
+<canvas id="phosphorTrail" aria-hidden="true"></canvas>
+<canvas id="vhsNoise" aria-hidden="true"></canvas>
+<div class="scanlines" aria-hidden="true"></div>
+<div class="rgb-aberration" id="rgbAberration" aria-hidden="true"></div>
+<div class="crt-vignette" aria-hidden="true"></div>
+
+<!-- Top teletext bar -->
+<header class="teletext" id="teletext">
+  <span class="tt-ch">CH-48</span>
+  <span class="tt-title" id="ttTitle">卡黄 · 黑白夜蝶</span>
+  <span class="tt-clock" id="ttClock">00:00:00</span>
+  <button class="tt-sound" id="btnSound" title="音效（默认静音）" aria-pressed="false">🔇 MUTE</button>
+</header>
+
+<!-- Liquid chrome butterfly -->
+<svg class="butterfly" id="butterfly" viewBox="0 0 200 160" aria-hidden="true">
+  <defs>
+    <linearGradient id="chromeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c0c8d8"/>
+      <stop offset="35%" stop-color="#f0f4ff"/>
+      <stop offset="55%" stop-color="#8a90a8"/>
+      <stop offset="80%" stop-color="#e8ecf8"/>
+      <stop offset="100%" stop-color="#a0a8c0"/>
+    </linearGradient>
+    <filter id="chromeGlow">
+      <feGaussianBlur stdDeviation="1.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g class="bf-wings" filter="url(#chromeGlow)">
+    <path class="wing-l" d="M100 80 C60 20,10 30,20 70 C5 90,40 110,70 95 C50 120,80 130,100 100 Z" fill="url(#chromeGrad)"/>
+    <path class="wing-r" d="M100 80 C140 20,190 30,180 70 C195 90,160 110,130 95 C150 120,120 130,100 100 Z" fill="url(#chromeGrad)"/>
+    <ellipse cx="100" cy="90" rx="6" ry="28" fill="#1a1a22"/>
+  </g>
+</svg>
+
+<!-- Dual CRT frame (desktop wow / mobile stack) -->
+<aside class="dual-crt" id="dualCrt" aria-hidden="true">
+  <div class="crt-unit green">
+    <div class="crt-bezel">
+      <div class="crt-screen phosphor-g">
+        <div class="crt-label">PHOSPHOR-G · 李艺彤</div>
+        <div class="crt-feed" id="feedGreen">SIGNAL LOCK…</div>
+      </div>
+    </div>
+  </div>
+  <div class="crt-unit magenta">
+    <div class="crt-bezel">
+      <div class="crt-screen phosphor-m">
+        <div class="crt-label">NTSC-M · 黄婷婷</div>
+        <div class="crt-feed" id="feedMagenta">SIGNAL LOCK…</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Vertical magnetic timeline rail -->
+<nav class="mag-rail" id="magRail" aria-label="章节磁轨">
+  <button class="rail-btn" data-goto="0" title="开场">◆</button>
+  <button class="rail-btn" data-goto="1" title="初识">初</button>
+  <button class="rail-btn" data-goto="2" title="夜蝶">蝶</button>
+  <button class="rail-btn" data-goto="3" title="131">131</button>
+  <button class="rail-btn" data-goto="4" title="爱恨的泪">泪</button>
+  <button class="rail-btn" data-goto="5" title="人鱼">鱼</button>
+  <button class="rail-btn" data-goto="6" title="沉默">默</button>
+  <button class="rail-btn" data-goto="7" title="终章">◎</button>
+</nav>
+
+<!-- Prev / Next -->
+<div class="pager-btns">
+  <button id="btnPrev" aria-label="上一章">▲ PREV</button>
+  <button id="btnNext" aria-label="下一章">▼ NEXT</button>
+</div>
+
+<!-- Main vertical snap theater -->
+<main class="theater" id="theater">
+
+  <!-- 0 SPLASH -->
+  <section class="ch" id="ch0" data-ch="开场" data-feed-g="BOOT SEQUENCE" data-feed-m="卡黄 ARCHIVE">
+    <div class="ch-inner splash-inner">
+      <p class="tt-line blink">▶ PLAY · 黑白夜蝶 · CRT水银失真剧场</p>
+      <h1 class="glitch-title" data-text="卡黄">卡黄</h1>
+      <p class="sub-title">黄婷婷 <span class="x-mark">×</span> 李艺彤</p>
+      <p class="tagline">Love · Hate · Static · 2013—2026</p>
+      <div class="vhs-stamp">VHS · FAN ARCHIVE · NOT OFFICIAL</div>
+      <button class="enter-btn" id="btnEnter">按下电源 · 进入剧场</button>
+      <p class="hint">滚轮 / 滑动 · 垂直磁吸章节</p>
+    </div>
+  </section>
+
+  <!-- 1 初识 -->
+  <section class="ch" id="ch1" data-ch="初识" data-feed-g="2013 TEAM NII" data-feed-m="同队初遇">
+    <div class="ch-inner">
+      <div class="ch-meta"><span class="ch-num">01</span><span class="ch-name">初识</span><span class="ch-year">2013—2014</span></div>
+      <h2 class="ch-h">Team NII · CP 爆发前夜</h2>
+      <div class="dual-panel">
+        <figure class="polaroid" data-solo="li">
+          <img src="assets/li3.jpg" alt="李艺彤" loading="lazy" />
+          <figcaption>李艺彤 · SOLO EJECT</figcaption>
+        </figure>
+        <figure class="polaroid" data-solo="huang">
+          <img src="assets/huang2.jpg" alt="黄婷婷" loading="lazy" />
+          <figcaption>黄婷婷 · SOLO EJECT</figcaption>
+        </figure>
+      </div>
+      <div class="story-block">
+        <p>2013，两人同属 <strong>SNH48 Team NII</strong>。舞台同框、综艺互动，粉丝开始捕捉「卡黄」化学反应。</p>
+        <p>2014，CP 讨论升温 —— 站位、眼神、握手，都被剪进同人视频。黑白夜蝶的翅膀，还没张开。</p>
+      </div>
+      <div class="photo-strip">
+        <img src="assets/duo1.jpg" alt="合影1" loading="lazy" />
+        <img src="assets/duo2.jpg" alt="合影2" loading="lazy" />
+        <img src="assets/duo3.jpg" alt="合影3" loading="lazy" />
+      </div>
+      <p class="src-note">图源：SNH48 官网新闻图 · 维基共享</p>
+    </div>
+  </section>
+
+  <!-- 2 夜蝶 -->
+  <section class="ch" id="ch2" data-ch="夜蝶" data-feed-g="夜蝶 GOLD SONG" data-feed-m="2015.01.31">
+    <div class="ch-inner">
+      <div class="ch-meta"><span class="ch-num">02</span><span class="ch-name">夜蝶</span><span class="ch-year">2015.1.31</span></div>
+      <h2 class="ch-h">《夜蝶》金曲 · 顶点与裂缝</h2>
+      <div class="karaoke" id="karaoke">
+        <p class="k-label">▶ 夜蝶 · LYRIC MODE（点击行高亮）</p>
+        <div class="k-lines" id="kLines">
+          <button class="k-line" data-t="0">黑夜里飞舞的蝶……</button>
+          <button class="k-line" data-t="1">翅膀切开月光的缝……</button>
+          <button class="k-line" data-t="2">两个人的影子叠成一双……</button>
+          <button class="k-line" data-t="3">掌声最响的夜里，信号开始噪点……</button>
+        </div>
+        <div class="k-progress"><div class="k-bar" id="kBar"></div></div>
+      </div>
+      <div class="story-block">
+        <p>2015.1.31 请求公演，《<strong>夜蝶</strong>》拿下金曲。卡黄站在聚光灯最亮处 —— 也是后来许多粉丝回望时，认定「最好看也最痛」的一夜。</p>
+        <p>同一天的暗线：<strong>131</strong> 取关冷战，即将写入下一章。</p>
+      </div>
+      <div class="photo-strip">
+        <img src="assets/duo4.jpg" alt="夜蝶相关1" loading="lazy" />
+        <img src="assets/duo5.jpg" alt="夜蝶相关2" loading="lazy" />
+        <img src="assets/zb1.png" alt="舞台1" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 131 -->
+  <section class="ch" id="ch3" data-ch="131" data-feed-g="UNFOLLOW EVENT" data-feed-m="COLD WAR">
+    <div class="ch-inner">
+      <div class="ch-meta"><span class="ch-num">03</span><span class="ch-name">131</span><span class="ch-year">2015</span></div>
+      <h2 class="ch-h">131 · 取关 · 冷战开机</h2>
+      <div class="quote-stack">
+        <blockquote class="quote clip" data-desync data-src="CLIP流传">
+          <span class="q-badge clip-badge">CLIP 流传</span>
+          <p>「婷婷桑的笑颜……」</p>
+          <cite>— 李艺彤（片段流传，非官网确认）</cite>
+        </blockquote>
+        <blockquote class="quote official" data-desync data-src="OFFICIAL">
+          <span class="q-badge off-badge">FLAG · 事件节点</span>
+          <p>131 前后社媒取关 · 公开互动断崖</p>
+          <cite>— 粉丝时间线共识（非官方声明）</cite>
+        </blockquote>
+      </div>
+      <div class="story-block">
+        <p>金曲夜的余温还没散尽，关系线突然静音。韩综 / MV 行程里两人仍可能同框，但「卡黄」作为公开 CP 叙事，开始进入噪点区。</p>
+        <p>点击上方引言 → <strong>双 CRT 失同步</strong> 特效。</p>
+      </div>
+      <div class="photo-strip">
+        <img src="assets/duo6.jpg" alt="合影" loading="lazy" />
+        <img src="assets/zb2.png" alt="舞台2" loading="lazy" />
+        <img src="assets/clip1.jpg" alt="流传素材示意" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 爱恨的泪 -->
+  <section class="ch" id="ch4" data-ch="爱恨的泪" data-feed-g="爱恨的泪 2017" data-feed-m="应援会解散">
+    <div class="ch-inner">
+      <div class="ch-meta"><span class="ch-num">04</span><span class="ch-name">爱恨的泪</span><span class="ch-year">2017</span></div>
+      <h2 class="ch-h">《爱恨的泪》冷舞台 · 应援会散场</h2>
+      <div class="story-block">
+        <p>2017，《<strong>爱恨的泪</strong>》舞台被许多观众形容为「礼貌而疏远」—— 动作对齐，眼神错开。</p>
+        <p>同年，相关 CP 应援会解散。粉丝侧的「官方叙事」熄灭，只剩私密剪辑在硬盘里循环。</p>
+      </div>
+      <div class="quote-stack">
+        <blockquote class="quote clip" data-desync>
+          <span class="q-badge clip-badge">CLIP 流传</span>
+          <p>「炸成烟花」</p>
+          <cite>— 李艺彤直播相关表述（流传版本）</cite>
+        </blockquote>
+        <blockquote class="quote clip" data-desync>
+          <span class="q-badge clip-badge">CLIP 流传</span>
+          <p>取关黄婷婷 · 衬衫梗</p>
+          <cite>— 直播/社交片段流传（请自行核对原档）</cite>
+        </blockquote>
+      </div>
+      <div class="dual-panel">
+        <figure class="polaroid" data-solo="li">
+          <img src="assets/li1.jpg" alt="李艺彤 总选" loading="lazy" />
+          <figcaption>李 · 总选影像</figcaption>
+        </figure>
+        <figure class="polaroid" data-solo="huang">
+          <img src="assets/huang1.jpg" alt="黄婷婷" loading="lazy" />
+          <figcaption>黄 · 公开照</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 人鱼 -->
+  <section class="ch" id="ch5" data-ch="人鱼" data-feed-g="人鱼 REFUSE" data-feed-m="2017.12 / 2018">
+    <div class="ch-inner">
+      <div class="ch-meta"><span class="ch-num">05</span><span class="ch-name">人鱼</span><span class="ch-year">2017.12—2018</span></div>
+      <h2 class="ch-h">拒唱《人鱼》· 冷舞台 · 总选榜</h2>
+      <div class="story-block">
+        <p>2017.12 直播：拒绝《人鱼》相关请求的流传版本，与「炸成烟花」一并被剪进无数混剪。</p>
+        <p>2018，《人鱼》冷舞台；总选赛道上一人冠军、一人第二 —— 聚光灯并排，关系线仍静音。</p>
+        <p>朋友圈互怼截图在饭圈流传（<span class="flag-clip">截图流传</span>，非双方官方完整语境）。</p>
+      </div>
+      <div class="quote-stack">
+        <blockquote class="quote clip" data-desync>
+          <span class="q-badge clip-badge">CLIP 流传</span>
+          <p>「挺幼稚的」 / 「体面」 / 排名式友谊隐喻</p>
+          <cite>— 黄婷婷侧后期表述（流传，未经完整官方确认请谨慎引用）</cite>
+        </blockquote>
+      </div>
+      <div class="dual-panel">
+        <figure class="polaroid" data-solo="li">
+          <img src="assets/li2.jpg" alt="李艺彤" loading="lazy" />
+          <figcaption>李 · 2017 总选</figcaption>
+        </figure>
+        <figure class="polaroid" data-solo="huang">
+          <img src="assets/huang3.jpg" alt="黄婷婷巡演" loading="lazy" />
+          <figcaption>黄 · 巡演实拍</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 沉默 -->
+  <section class="ch" id="ch6" data-ch="沉默" data-feed-g="SILENCE YEARS" data-feed-m="2019—2026">
+    <div class="ch-inner">
+      <div class="ch-meta"><span class="ch-num">06</span><span class="ch-name">沉默</span><span class="ch-year">2019—2026</span></div>
+      <h2 class="ch-h">毕业 · 诉讼余波 · 多年静默</h2>
+      <div class="story-block">
+        <p>2019，李艺彤毕业；黄婷婷侧有诉讼相关公开信息进入新闻周期。两人公开同框与互动进入长静默。</p>
+        <p>2024—2026：饭圈仍在流传旧片段与「复合」剪辑（<span class="flag-clip">CLIP 流传</span>），<strong>无经核实的公开和解</strong>。</p>
+      </div>
+      <div class="status-stamp" id="statusStamp">
+        <div class="stamp-inner">
+          <span class="stamp-mark">STATUS</span>
+          <p>截至 2026-10<br/>无公开和解</p>
+        </div>
+      </div>
+      <div class="poll" id="poll">
+        <p class="poll-q">你怎么看卡黄结局？（本地投票，不上传）</p>
+        <div class="poll-opts">
+          <button data-opt="A">A. 已经落幕，不必强求</button>
+          <button data-opt="B">B. 希望有一天体面重逢</button>
+          <button data-opt="C">C. 只吃舞台，不吃八卦</button>
+          <button data-opt="D">D. 真相在硬盘里，不在热搜</button>
+        </div>
+        <div class="poll-result" id="pollResult" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 END -->
+  <section class="ch" id="ch7" data-ch="终章" data-feed-g="END OF TAPE" data-feed-m="REWIND?">
+    <div class="ch-inner end-inner">
+      <h2 class="glitch-title sm" data-text="END OF TAPE">END OF TAPE</h2>
+      <p class="end-line">两台 CRT，两种磷光。<br/>同队、金曲、取关、冷舞台、静默 —— 都录在这卷带上。</p>
+      <div class="status-stamp small">
+        <div class="stamp-inner">
+          <span class="stamp-mark">VERIFY</span>
+          <p>截至 2026-10<br/>无公开和解</p>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i class="lg off"></i> OFFICIAL / 事件节点</span>
+        <span><i class="lg clip"></i> CLIP 流传（需自核）</span>
+      </div>
+      <footer class="site-foot">
+        <p>本页为<strong>粉丝互动解说 / 时间线整理</strong>，非官方立场，不代表当事人本人。</p>
+        <p>引语凡标「CLIP 流传」均来自公开流传片段或二手转述，请以原始影像为准。</p>
+        <p>照片来自 SNH48 官网活动图、维基共享等可公开访问源；版权归原权利方。</p>
+        <p class="foot-sys">黒白夜蝶 · CRT水银失真剧场 · 垂直磁吸时间轴</p>
+      </footer>
+      <button class="enter-btn" id="btnRewind">◀◀ REWIND · 回到开场</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- Polaroid eject overlay -->
+<div class="eject-layer" id="ejectLayer" hidden>
+  <div class="eject-card" id="ejectCard">
+    <img id="ejectImg" alt="" />
+    <p id="ejectCap"></p>
+    <button id="ejectClose">推回卡槽 · ESC</button>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
